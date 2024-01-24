@@ -17,6 +17,10 @@ private val dataProvider = object : DataProvider {
     override suspend fun getRows() = listOf(
         DataProvider.MathRow.AddOne(1),
         DataProvider.MathRow.MinusOne(10),
+        DataProvider.MathRow.PlusMinusValue(
+            DataProvider.MathRow.AddOne(-10),
+            DataProvider.MathRow.MinusOne(100)
+        ),
         DataProvider.MathRow.TimesValue(2, 2f),
         DataProvider.MathRow.TwoValue(10, 20),
         DataProvider.MathRow.TwoValue(100, 200),

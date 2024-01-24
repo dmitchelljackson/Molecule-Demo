@@ -8,8 +8,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +21,19 @@ data class MinusOneUiItem(
 ) : MainState.Loaded.MathUiItem
 
 @Composable
-fun MinusOnePresenter(minusOne: DataProvider.MathRow.MinusOne): MinusOneUiItem {
-    var value by remember { mutableStateOf(minusOne.value) }
+fun MinusOnePresenter(minusOne: DataProvider.MathRow.MinusOne) = presenter {
+    var value by rememberedForOutput(minusOne.value)
 
-    return MinusOneUiItem(
-        value = value,
-        onClick = {
-            value--
-        }
-    )
+    val onClick by callback {
+        value--
+    }
+
+    onOutputValuesChanged {
+        MinusOneUiItem(
+            value = value,
+            onClick = onClick
+        )
+    }
 }
 
 @Composable

@@ -8,8 +8,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,16 +21,19 @@ data class TimesUiItem(
 ) : MainState.Loaded.MathUiItem
 
 @Composable
-fun MultiplyPresenter(timesValue: DataProvider.MathRow.TimesValue): TimesUiItem {
-    var value by remember { mutableStateOf(timesValue.value) }
-    var factor by remember { mutableStateOf(timesValue.factor) }
-
-    return TimesUiItem(
-        value = value,
-        onClick = {
-            value = (value * factor).toInt()
-        }
-    )
+fun MultiplyPresenter(timesValue: DataProvider.MathRow.TimesValue) = presenter {
+    var value by rememberedForOutput(timesValue.value)
+    val factor by rememberedForOutput(timesValue.factor)
+    
+    val onClick by callback {
+        value = (value * factor).toInt()
+    }
+    onOutputValuesChanged {
+        TimesUiItem(
+            value = value,
+            onClick = onClick
+        )
+    }
 }
 
 @Composable

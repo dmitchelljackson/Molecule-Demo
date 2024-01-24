@@ -9,8 +9,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,30 +16,38 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-data class AddOneUiItem(
+@Composable
+fun AddOnePresenter(addOne: DataProvider.MathRow.AddOne) = presenter {
+
+    var value by rememberedForOutput(addOne.value)
+
+    val onClick by callback {
+        value++
+    }
+
+    onOutputValuesChanged {
+        Log.d("Mitchell", "renderState")
+        AddOneElement(
+            value = value,
+            onClick = onClick
+        )
+    }
+}
+
+
+data class AddOneElement(
     val value: Int,
     val onClick: () -> Unit
 ) : MainState.Loaded.MathUiItem
 
 @Composable
-fun AddOnePresenter(addOne: DataProvider.MathRow.AddOne): AddOneUiItem {
-    var value by remember { mutableStateOf(addOne.value) }
-
-    Log.d("Mitchell", "AddOnePresenter")
-    return AddOneUiItem(
-        value = value,
-        onClick = {
-            value++
-        }
-    )
-}
-
-@Composable
-fun AddOneUi(item: AddOneUiItem) {
-    Box(modifier = Modifier
-        .wrapContentHeight()
-        .padding(4.dp)
-        .fillMaxWidth()) {
+fun AddOneUi(item: AddOneElement) {
+    Box(
+        modifier = Modifier
+            .wrapContentHeight()
+            .padding(4.dp)
+            .fillMaxWidth()
+    ) {
         Text(
             modifier = Modifier.align(Alignment.CenterStart),
             text = item.value.toString(),
@@ -60,5 +66,6 @@ fun AddOneUi(item: AddOneUiItem) {
 @Preview
 @Composable
 fun AddOneUiExample() {
-    AddOneUi(AddOneUiItem(1, {}))
+    AddOneUi(AddOneElement(1, {}))
 }
+

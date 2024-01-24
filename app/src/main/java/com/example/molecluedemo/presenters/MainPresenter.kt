@@ -24,7 +24,7 @@ sealed interface MainState {
 }
 
 @Composable
-fun MainPresenter(dataProvider: DataProvider): MainState {
+fun MainPresenter(dataProvider: DataProvider) = presenter {
     var inputList: List<DataProvider.MathRow>? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
@@ -33,26 +33,31 @@ fun MainPresenter(dataProvider: DataProvider): MainState {
     }
 
     if (inputList == null) {
-        return MainState.Loading
+        return@presenter MainState.Loading
     }
 
-    return inputList?.let { list ->
-        MainState.Loaded(
-            list.map {
-                when (it) {
-                    is DataProvider.MathRow.AddOne -> AddOnePresenter(it)
-                    is DataProvider.MathRow.MinusOne -> MinusOnePresenter(it)
-                    is DataProvider.MathRow.TimesValue -> MultiplyPresenter(it)
-                    is DataProvider.MathRow.TwoValue -> TwoValuePresenter(it)
-                }
+    val outputList = inputList?.let { list ->
+        list.map {
+            when (it) {
+                is DataProvider.MathRow.AddOne -> AddOnePresenter(it)
+                is DataProvider.MathRow.MinusOne -> MinusOnePresenter(it)
+                is DataProvider.MathRow.TimesValue -> MultiplyPresenter(it)
+                is DataProvider.MathRow.TwoValue -> TwoValuePresenter(it)
+                is DataProvider.MathRow.PlusMinusValue -> PlusMinusPresenter(it)
             }
+        }
+    }
+
+    outputList?.let { list ->
+        MainState.Loaded(
+            list
         )
     } ?: MainState.Loading
 }
 
 @Composable
 fun MainUi(mainState: MainState) {
-    when(mainState) {
+    when (mainState) {
         is MainState.Loading -> {
             CircularProgressIndicator(
                 modifier = Modifier
@@ -64,11 +69,12 @@ fun MainUi(mainState: MainState) {
             LazyColumn(Modifier) {
                 mainState.list.forEach {
                     item {
-                        when(it) {
-                            is AddOneUiItem -> AddOneUi(it)
+                        when (it) {
+                            is AddOneElement -> AddOneUi(it)
                             is MinusOneUiItem -> MinusOneUi(it)
                             is TimesUiItem -> MultiplyUi(it)
                             is TwoValueUiItem -> TwoValueUi(it)
+                            is PlusMinusUiItem -> PlusMinusUi(it)
                         }
                     }
                 }
@@ -85,5 +91,6 @@ interface DataProvider {
         data class MinusOne(val value: Int) : MathRow
         data class TimesValue(val value: Int, val factor: Float) : MathRow
         data class TwoValue(val value1: Int, val value2: Int) : MathRow
+        data class PlusMinusValue(val addOne: AddOne, val minusOne: MinusOne) : MathRow
     }
 }

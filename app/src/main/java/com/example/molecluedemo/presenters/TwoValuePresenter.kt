@@ -8,8 +8,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,27 +22,32 @@ data class TwoValueUiItem(
 ) : MainState.Loaded.MathUiItem
 
 @Composable
-fun TwoValuePresenter(twoValue: DataProvider.MathRow.TwoValue): TwoValueUiItem {
+fun TwoValuePresenter(twoValue: DataProvider.MathRow.TwoValue) = presenter {
 
-    val value1 by remember { mutableStateOf(twoValue.value1) }
-    val value2 by remember { mutableStateOf(twoValue.value2) }
-    var shouldShowFirstValue by remember { mutableStateOf(true) }
+    val value1 by rememberedForOutput(twoValue.value1)
+    val value2 by rememberedForOutput(twoValue.value2)
 
-    return TwoValueUiItem(
-        value = if (shouldShowFirstValue) {
-            value1
-        } else {
-            value2
-        },
-        buttonText = if (shouldShowFirstValue) {
-            "show second value"
-        } else {
-            "show first value"
-        },
-        onClick = {
-            shouldShowFirstValue = !shouldShowFirstValue
-        }
-    )
+    var shouldShowFirstValue by rememberedForOutput(true)
+
+    val onClick by callback {
+        shouldShowFirstValue = !shouldShowFirstValue
+    }
+
+    onOutputValuesChanged {
+        TwoValueUiItem(
+            value = if (shouldShowFirstValue) {
+                value1
+            } else {
+                value2
+            },
+            buttonText = if (shouldShowFirstValue) {
+                "show second value"
+            } else {
+                "show first value"
+            },
+            onClick = onClick
+        )
+    }
 }
 
 @Composable
